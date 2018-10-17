@@ -16,16 +16,42 @@ export default class BlurOverlay extends React.Component {
           showBlurOverlay: false,
           fadeIn: new Animated.Value(0),
         }
-        openOverlay = openOverlay.bind(this);
-        closeOverlay = closeOverlay.bind(this);
-
+        this.ref = this;
     }
 
+    openOverlay() {
+        this.setState({
+            showBlurOverlay: true,
+            fadeIn: new Animated.Value(0),
+        }, () => {
+            Animated.parallel([
+                Animated.timing(
+                    this.state.fadeIn,
+                    {
+                        toValue: 1,
+                        duration: 500,
+                    }
+                )
+            ]).start();
+        })
+    }
 
-        render() {
+    closeOverlay() {
+        Animated.parallel([
+            Animated.timing(
+                this.state.fadeIn,
+                {
+                    toValue: 0,
+                    duration: 500,
+                    useNativeDriver: true
+                }
+            )
+        ]).start(()=>this.setState({showBlurOverlay: false}));
+    
+    }
 
-          const { children } = this.props;
-
+    render() {
+        const { children } = this.props;
         return (
             this.state.showBlurOverlay ?
             <Animated.View style={[ {opacity: this.state.fadeIn},styles.style]}>
@@ -58,37 +84,5 @@ const styles = StyleSheet.create({
         zIndex: 999,
     },
 });
-export function openOverlay() {
-
-    this.setState({
-        showBlurOverlay: true,
-        fadeIn: new Animated.Value(0),
-    }, () => {
-        Animated.parallel([
-            Animated.timing(
-                this.state.fadeIn,
-                {
-                    toValue: 1,
-                    duration: 500,
-                }
-            )
-        ]).start();
-    })
-
-}
-
-export function closeOverlay() {
-    Animated.parallel([
-        Animated.timing(
-            this.state.fadeIn,
-            {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true
-            }
-        )
-    ]).start(()=>this.setState({showBlurOverlay: false}));
-
-}
 //export default SajjadBlurOverlay;
 //module.exports = requireNativeComponent('RCTSajjadBlurOverlay', iface);
